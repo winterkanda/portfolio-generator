@@ -1,21 +1,22 @@
 // commented the below line out b/c I'm no longer going to use the fs library in this file
 // const fs = require('fs');
 
-const inquirer = require('inquirer');
-const generatePage = require('../src/page-template');
-const { writeFile, copyFile } = require('./utils/generate-site');
+const { writeFile, copyFile } = require('./utils/generate-site.js');
+const generatePage = require("./src/page-template.js");
+
+const inquirer = require("inquirer");
 
 const promptUser = () => {
   return inquirer.prompt([
     {
       type: 'input',
       name: 'name',
-      message: 'What is your name? (Required)',
+      message: 'What is your name?',
       validate: nameInput => {
         if (nameInput) {
           return true;
         } else {
-          console.log('Please enter your name!');
+          console.log("Please enter your name!");
           return false;
         }
       }
@@ -23,12 +24,12 @@ const promptUser = () => {
     {
       type: 'input',
       name: 'github',
-      message: 'Enter your GitHub Username (Required)',
-      validate: githubInput => {
-        if (githubInput) {
+      message: 'Enter your GitHub Username',
+      validate: gitHubInput => {
+        if (gitHubInput) {
           return true;
         } else {
-          console.log('Please enter your GitHub username!');
+          console.log("Please enter your GitHub Username!");
           return false;
         }
       }
@@ -36,89 +37,102 @@ const promptUser = () => {
     {
       type: 'confirm',
       name: 'confirmAbout',
-      message: 'Would you like to enter some information about yourself for an "About" section?',
+      message: 'Would you like to enter some information about yourself for an about section?',
       default: true
     },
     {
       type: 'input',
       name: 'about',
       message: 'Provide some information about yourself:',
-      when: ({ confirmAbout }) => confirmAbout
-    }
+      when: ({ confirmAbout }) => {
+        if (confirmAbout) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    },
   ]);
 };
 
 const promptProject = portfolioData => {
-  console.log(`
-=================
-Add a New Project
-=================
-`);
 
   // If there's no 'projects' array property, create one
   if (!portfolioData.projects) {
     portfolioData.projects = [];
   }
-  return inquirer
-    .prompt([
-      {
-        type: 'input',
-        name: 'name',
-        message: 'What is the name of your project? (Required)',
-        validate: nameInput => {
-          if (nameInput) {
-            return true;
-          } else {
-            console.log('You need to enter a project name!');
-            return false;
-          }
+
+  console.log(`
+  =================
+  Add a New Project
+  =================
+  `);
+  return inquirer.prompt([
+    {
+      type: 'input',
+      name: 'name',
+      message: 'What is the name of your project?',
+      validate: projectNameInput => {
+        if (projectNameInput) {
+          return true;
+        } else {
+          console.log("Please enter your project name!");
+          return false;
         }
-      },
-      {
-        type: 'input',
-        name: 'description',
-        message: 'Provide a description of the project (Required)',
-        validate: descriptionInput => {
-          if (descriptionInput) {
-            return true;
-          } else {
-            console.log('You need to enter a project description!');
-            return false;
-          }
-        }
-      },
-      {
-        type: 'checkbox',
-        name: 'languages',
-        message: 'What did you this project with? (Check all that apply)',
-        choices: ['JavaScript', 'HTML', 'CSS', 'ES6', 'jQuery', 'Bootstrap', 'Node']
-      },
-      {
-        type: 'input',
-        name: 'link',
-        message: 'Enter the GitHub link to your project. (Required)',
-        validate: linkInput => {
-          if (linkInput) {
-            return true;
-          } else {
-            console.log('You need to enter a project GitHub link!');
-            return false;
-          }
-        }
-      },
-      {
-        type: 'confirm',
-        name: 'feature',
-        message: 'Would you like to feature this project?',
-        default: false
-      },
-      {
-        type: 'confirm',
-        name: 'confirmAddProject',
-        message: 'Would you like to enter another project?',
-        default: false
       }
-    ])
+    },
+    {
+      type: 'input',
+      name: 'description',
+      message: 'Provide a description of the project. (Required)',
+      validate: projectInfoInput => {
+        if (projectInfoInput) {
+          return true;
+        } else {
+          console.log("Please enter your project description!");
+          return false;
+        }
+      }
+    },
+    {
+      type: 'checkbox',
+      name: 'languages',
+      choices: ['JavaScript', 'HTML', 'CSS', 'ES6', 'jQuery', 'Bootstrap', 'Node'],
+      validate: languagesInput => {
+        if (languagesInput) {
+          return true;
+        } else {
+          console.log("Please select your known languages!");
+          return false;
+        }
+      }
+    },
+    {
+      type: 'input',
+      name: 'link',
+      message: 'Enter the GitHub link to your project. (Required)',
+      validate: linkInput => {
+        if (linkInput) {
+          return true;
+        } else {
+          console.log("Please enter your project link!");
+          return false;
+        }
+      }
+    },
+    {
+      type: 'confirm',
+      name: 'feature',
+      message: 'Would you like to feature this project?',
+      default: false
+    },
+    {
+      type: 'confirm',
+      name: 'confirmAddProject',
+      message: 'Would you like to enter another project?',
+      default: false
+    }
+  ])
     .then(projectData => {
       portfolioData.projects.push(projectData);
       if (projectData.confirmAddProject) {
@@ -126,9 +140,8 @@ Add a New Project
       } else {
         return portfolioData;
       }
-    });
+    })
 };
-
 
 promptUser()
   .then(promptProject)
